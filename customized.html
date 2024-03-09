@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customized Wikipedia</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Additional CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px;
+      position: relative;
+    }
+
+    header, footer {
+      padding: 10px;
+      background-color: #3dc1f5;
+      color: #ffffff;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+
+    footer {
+      margin-top: 20px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    #searchContainer {
+      display: flex;
+      justify-content: space-between; /* Adjusted for space between elements */
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #searchInput, #notePadInput {
+      flex-grow: 1; /* Allows the input to grow and take available space */
+      width: auto;
+      padding: 10px;
+      border: 1px solid #756f6f;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    .btn-group {
+      margin-left: 10px;
+    }
+
+    .box {
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .options {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .options.show {
+      display: block;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    #searchResults {
+      max-width: 800px;
+      overflow-y: auto;
+    }
+
+    .listen-menu {
+      display: none;
+      position: absolute;
+      top: 60px; /* Adjusted for space between elements */
+      right: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .listen-menu.show {
+      display: block;
+    }
+
+    .listen-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background-color: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .listen-menu button:hover {
+      background-color: #f0f0f0;
+    }
+
+    .language-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 130px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .language-menu.show {
+      display: block;
+    }
+
+    .language-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background-color: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+    
+    .language-menu button:hover {
+      background-color: #f0f0f0;
+    }
+
+
+    .fun-fact-bubble {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      animation-name: moveBubble;
+      animation-duration: 10s;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes moveBubble {
+      0% {
+        transform: translate(0, 0);
+      }
+      50% {
+        transform: translate(50px, 50px);
+      }
+      100% {
+        transform: translate(0, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Wikifyme : Personalize Your Wiki World</h1>
+  </header>
+
+
+  <div class="container">
+    <div id="searchContainer">
+      <input type="text" id="searchInput" class="form-control" placeholder="Enter the word you wanna know about">
+      <button id="searchVoiceBtn" class="btn btn-primary">🎙️</button>
+      <button id="searchBtn" class="btn btn-primary">Search 🔍</button>
+      <div class="btn-group">
+        <button id="customizeBtn" class="btn btn-secondary">Customize 📃</button>
+        <button id="listenBtn" class="btn btn-info">Listen 👂</button>
+        <button id="stopBtn" class="btn btn-danger">Stop 🚫</button>
+        <button id="languageBtn" class="btn btn-warning">Language</button>
+      </div>
+    </div>
+    <!-- HTML for the floating bubbles -->
+    <div class="box" id="customBox">
+      <div id="searchResults"></div>
+    </div>
+    <div class="options" id="formattingOptions">
+      <label for="fontSize">Font Size:</label>
+      <input type="range" id="fontSize" name="fontSize" class="form-control-range" min="10" max="100" step="1">
+      <label for="fontAdjustment">Font Adjustment:</label>
+<select id="fontAdjustment" name="fontAdjustment" class="form-control">
+  <option value="normal">Normal</option>
+  <option value="myopia">Myopia (Nearsightedness)</option>
+  <option value="hypermetropia">Hypermetropia (Farsightedness)</option>
+</select>
+
+
+      <label for="fontColor">Font Color:</label>
+      <input type="color" id="fontColor" name="fontColor" class="form-control">
+
+      
+      <label for="fontFamily">Font Family:</label>
+      <select id="fontFamily" name="fontFamily" class="form-control">
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="Times New Roman, serif">Times New Roman</option>
+        <option value="Tahoma, sans-serif">Tahoma</option>
+        <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+        <option value="Courier New, monospace">Courier New</option>
+      </select>
+
+      <label for="textAlignment">Text Alignment:</label>
+      <select id="textAlignment" name="textAlignment" class="form-control">
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+        <option value="justify">Justify</option>
+      </select>
+
+      <label for="textContrast">Text Contrast:</label>
+      <select id="textContrast" name="textContrast" class="form-control">
+        <option value="normal">Normal</option>
+        <option value="high">High</option>
+      </select>
+
+      <label for="letterSpacing">Letter Spacing:</label>
+      <input type="range" id="letterSpacing" name="letterSpacing" class="form-control-range" min="0" max="4" step="0.1">
+
+      <label for="lineHeight">Line Height:</label>
+      <input type="range" id="lineHeight" name="lineHeight" class="form-control-range" min="1" max="45" step="0.1">
+    </div>
+
+    <div class="listen-menu" id="voiceMenu">
+      <button id="femaleVoiceBtn">Female Voice 👧</button>
+      <button id="maleVoiceBtn">Male Voice 👦</button>
+    </div>
+
+    
+    <div class="language-menu" id="languageMenu">
+      <button id="teluguBtn">Telugu </button>
+      <button id="hindiBtn">Hindi</button>
+      <button id="tamilBtn">Tamil</button>
+      <button id="kannadaBtn">Kannada</button>
+    </div>
+
+  
+<div id="notePadContainer">
+  <textarea id="notePadInput" class="form-control" rows="5" placeholder="Jot down ✒️"></textarea>
+  <button id="notePadVoiceBtn" class="btn btn-primary">🎤</button>
+
+</div>
+
+  </div>
+
+  <footer>
+    © 2024 Customized Wikipedia. All rights reserved.
+  </footer>
+
+  <script>
+    // JavaScript code here
+    document.addEventListener('DOMContentLoaded', function () {
+      // Add event listener for search button
+      const searchBtn = document.getElementById('searchBtn');
+      searchBtn.addEventListener('click', search);
+
+      // Add event listener for voice search button
+      const searchVoiceBtn = document.getElementById('searchVoiceBtn');
+      searchVoiceBtn.addEventListener('click', startSpeechToTextSearch);
+
+      // Customize button
+      const customizeBtn = document.getElementById('customizeBtn');
+      customizeBtn.addEventListener('click', toggleOptions);
+
+      // Listen button
+      const listenBtn = document.getElementById('listenBtn');
+      listenBtn.addEventListener('click', toggleListenMenu);
+
+      // Stop button
+      const stopBtn = document.getElementById('stopBtn');
+      stopBtn.addEventListener('click', stopSpeaking);
+
+      // Language button
+      const languageBtn = document.getElementById('languageBtn');
+      languageBtn.addEventListener('click', toggleLanguageMenu);
+
+      // Font Size Input
+      const fontSizeInput = document.getElementById('fontSize');
+      fontSizeInput.addEventListener('input', () => {
+        document.getElementById('searchResults').style.fontSize = fontSizeInput.value + 'px';
+      });
+      // Font Adjustment Select
+const fontAdjustmentSelect = document.getElementById('fontAdjustment');
+fontAdjustmentSelect.addEventListener('change', () => {
+  adjustFontSize(fontAdjustmentSelect.value);
+});
+
+function adjustFontSize(adjustment) {
+  const searchResults = document.getElementById('searchResults');
+  switch (adjustment) {
+    case 'myopia':
+      searchResults.style.fontSize = 'larger';
+      break;
+    case 'hypermetropia':
+      searchResults.style.fontSize = 'smaller';
+      break;
+    default:
+      searchResults.style.fontSize = 'initial';
+  }
+}
+
+      // Font Color Input
+      const fontColorInput = document.getElementById('fontColor');
+      fontColorInput.addEventListener('input', () => {
+        document.getElementById('searchResults').style.color = fontColorInput.value;
+      });
+
+      // Font Family Select
+      const fontFamilySelect = document.getElementById('fontFamily');
+      fontFamilySelect.addEventListener('change', () => {
+        document.getElementById('searchResults').style.fontFamily = fontFamilySelect.value;
+      });
+
+      // Text Alignment Select
+      const textAlignmentSelect = document.getElementById('textAlignment');
+      textAlignmentSelect.addEventListener('change', () => {
+        document.getElementById('searchResults').style.textAlign = textAlignmentSelect.value;
+      });
+
+      // Text Contrast Select
+      const textContrastSelect = document.getElementById('textContrast');
+      textContrastSelect.addEventListener('change', () => {
+        const searchResults = document.getElementById('searchResults');
+        if (textContrastSelect.value === 'high') {
+          searchResults.style.color = '#fff';
+          searchResults.style.backgroundColor = '#000';
+        } else {
+          searchResults.style.color = fontColorInput.value;
+          searchResults.style.backgroundColor = 'transparent';
+        }
+      });
+
+      // Letter Spacing Input
+      const letterSpacingInput = document.getElementById('letterSpacing');
+      letterSpacingInput.addEventListener('input', () => {
+        document.getElementById('searchResults').style.letterSpacing = letterSpacingInput.value + 'px';
+      });
+
+      // Line Height Input
+      const lineHeightInput = document.getElementById('lineHeight');
+      lineHeightInput.addEventListener('input', () => {
+        document.getElementById('searchResults').style.lineHeight = lineHeightInput.value;
+      });
+
+      // Female Voice Button
+      const femaleVoiceBtn = document.getElementById('femaleVoiceBtn');
+      femaleVoiceBtn.addEventListener('click',() => {
+        readOutLoud('en-US','female');
+      });
+
+      // Male Voice Button
+      const maleVoiceBtn = document.getElementById('maleVoiceBtn');
+      maleVoiceBtn.addEventListener('click',() => {
+        readOutLoud('en-US','male');
+      });
+
+      // Telugu Button
+      const teluguBtn = document.getElementById('teluguBtn');
+      teluguBtn.addEventListener('click', () => {
+        translate('te');
+      });
+
+      // Hindi Button
+      const hindiBtn = document.getElementById('hindiBtn');
+      hindiBtn.addEventListener('click', () => {
+        translate('hi');
+      });
+
+      // Tamil Button
+      const tamilBtn = document.getElementById('tamilBtn');
+      tamilBtn.addEventListener('click', () => {
+        translate('ta');
+      });
+
+      // Kannada Button
+      const kannadaBtn = document.getElementById('kannadaBtn');
+      kannadaBtn.addEventListener('click', () => {
+        translate('kn');
+      });
+
+      // Add event listener for note pad voice button
+      const notePadVoiceBtn = document.getElementById('notePadVoiceBtn');
+      notePadVoiceBtn.addEventListener('click', startSpeechToTextNotePad);
+
+      const languagebtn = document.getElementById('languageBtn').parentNode;
+  languageBtn.parentNode.insertBefore(savedFilesBtn, languageBtn.nextSibling);
+});
+
+
+   function search() {
+      const searchQuery = document.getElementById('searchInput').value;
+      if (!searchQuery) {
+        alert('Enter a word to search');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro&explaintext&redirects=1&titles=${encodeURIComponent(searchQuery)}&callback=processResponse`;
+      document.body.appendChild(script);
+    }
+
+    function processResponse(data) {
+      const pageId = Object.keys(data.query.pages)[0];
+      const extract = data.query.pages[pageId].extract;
+      const links = `https://en.wikipedia.org/?curid=${pageId}`;
+      displaySearchResults(extract, links);
+    }
+
+    function displaySearchResults(extract, links) {
+      const searchResultsDiv = document.getElementById('searchResults');
+      searchResultsDiv.innerHTML = extract ? `<p>${extract}</p><p><a href="${links}" target="_blank">Click here for more info on Wikipedia</a></p>` : '<p>No results found.</p>';
+    }
+
+    function toggleOptions() {
+      const options = document.getElementById('formattingOptions');
+      options.classList.toggle('show');
+    }
+
+    function toggleListenMenu() {
+      const listenMenu = document.getElementById('voiceMenu');
+      listenMenu.classList.toggle('show');
+    }
+
+    function toggleLanguageMenu() {
+      const languageMenu = document.getElementById('languageMenu');
+      languageMenu.classList.toggle('show');
+    }
+
+    function readOutLoud(language, voice) {
+      const searchResults = document.getElementById('searchResults').textContent;
+      const speech = new SpeechSynthesisUtterance();
+      speech.lang = language;
+      speech.text = searchResults;
+
+      // Set the voice
+      const voices = window.speechSynthesis.getVoices();
+      const selectedVoice = voices.find(v => v.name.toLowerCase().includes(voice));
+      speech.voice = selectedVoice;
+
+      // Speak
+      speechSynthesis.speak(speech);
+    }
+
+    function stopSpeaking() {
+      speechSynthesis.cancel();
+    }
+
+    function translate(language) {
+      const searchResults = document.getElementById('searchResults').textContent;
+      fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${language}&dt=t&q=${encodeURIComponent(searchResults)}`)
+        .then(response => response.json())
+        .then(data => {
+          const translatedText = data[0][0][0];
+          document.getElementById('searchResults').innerHTML = `<p>${translatedText}</p>`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    function startSpeechToTextSearch() {
+      const recognition = new window.webkitSpeechRecognition() || new window.SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = function (event) {
+        const speechResult = event.results[0][0].transcript;
+        document.getElementById('searchInput').value = speechResult;
+      };
+
+      recognition.onerror = function (event) {
+        console.error('Speech recognition error:', event.error);
+      };
+    }
+
+    function startSpeechToTextNotePad() {
+      const recognition = new window.webkitSpeechRecognition() || new window.SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = function (event) {
+        const speechResult = event.results[0][0].transcript;
+        document.getElementById('notePadInput').value += speechResult + ' ';
+      };
+
+      recognition.onerror = function (event) {
+        console.error('Speech recognition error:', event.error);
+      };
+    // Array of fun facts
+    const funFacts = [
+      "The Eiffel Tower can be 15 cm taller during the summer due to thermal expansion of the iron.",
+      "The shortest war in history was between Britain and Zanzibar on August 27, 1896. Zanzibar surrendered after 38 minutes.",
+      // Add more fun facts here...
+    ];
+
+    // Function to generate a random index
+    function getRandomIndex(max) {
+      return Math.floor(Math.random() * max);
+    }
+
+    // Function to create and display a transparent bubble with a fun fact
+    function createFunFactBubble() {
+      const funFactIndex = getRandomIndex(funFacts.length);
+      const funFact = funFacts[funFactIndex];
+
+      const bubble = document.createElement('div');
+      bubble.classList.add('fun-fact-bubble');
+      bubble.style.left = `${Math.random() * (window.innerWidth - 10)}px`;
+      bubble.style.top = `${Math.random() * (window.innerHeight - 10)}px`;
+      bubble.textContent = funFact;
+      document.body.appendChild(bubble);
+
+      // Remove the bubble after a certain time
+      setTimeout(() => {
+        bubble.remove();
+      }, 600000); // Remove after 1 minutes (1 * 60 * 1000 milliseconds)
+    }
+
+    // Call the function to create a bubble initially
+    createFunFactBubble();
+
+    // Periodically create new bubbles with fun facts
+    setInterval(createFunFactBubble, 300000); // Generate every 1 minutes (1 * 60 * 1000 milliseconds)
+    }
+    
+  </script>
+</body>
+</html>
